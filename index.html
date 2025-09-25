@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Sistema de Exportaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #1565c0;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #32325d;
+            --text-light: #8a8e9d;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #1976d2;
+            --secondary-color: #2196f3;
+            --background-color: #121212;
+            --card-color: #1e1e1e;
+            --text-color: #e1e1e1;
+            --text-light: #a0a0a0;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .peru-flag-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: linear-gradient(to right, #d91023 33.3%, white 33.3%, white 66.6%, #d91023 66.6%);
+        }
+
+        [data-theme="dark"] .peru-flag-background {
+            opacity: 0.05;
+            background: linear-gradient(to right, #b31b2a 33.3%, #333 33.3%, #333 66.6%, #b31b2a 66.6%);
+        }
+
+        .login-wrapper {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .login-container {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .recent-users {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            width: 100%;
+            max-width: 320px;
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .recent-users h3 {
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e5eb;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        [data-theme="dark"] .user-item {
+            background: #2a2a2a;
+        }
+
+        .user-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            animation: pulse 1s infinite;
+        }
+
+        [data-theme="dark"] .user-item:hover {
+            background: #333;
+        }
+
+        .user-item.selected {
+            background: #e3f2fd;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.2);
+        }
+
+        [data-theme="dark"] .user-item.selected {
+            background: #2a4365;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            border: 2px solid var(--primary-color);
+            animation: bounceIn 1s ease-out;
+        }
+
+        .avatar-placeholder {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #0d47a1, #1565c0);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            border: 2px solid #0d47a1;
+            animation: bounceIn 1s ease-out;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .login-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            animation: fadeInDown 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.2) 100%);
+            z-index: 1;
+        }
+
+        .login-header h2 {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #fcfcfc;
+            animation: zoomIn 0.8s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        [data-theme="dark"] .form-control {
+            background: #2a2a2a;
+            border-color: #333;
+            color: #e1e1e1;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.15);
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            animation: fadeInUp 1.2s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .msg {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error {
+            background: #ffeff1;
+            color: var(--error-color);
+            border-left: 4px solid var(--error-color);
+        }
+
+        [data-theme="dark"] .error {
+            background: #2d1b24;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .register-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .register-link a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .register-link a:hover::after {
+            width: 100%;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            color: var(--primary-color);
+            animation: bounce 2s infinite, glow 3s infinite alternate;
+            box-shadow: 0 0 20px rgba(13, 71, 161, 0.4);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            border: 3px solid white;
+        }
+
+        .logo img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        [data-theme="dark"] .logo {
+            background: #2a2a2a;
+            box-shadow: 0 0 20px rgba(25, 118, 210, 0.6);
+            border: 3px solid #2a2a2a;
+        }
+
+        .click-hint {
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-color);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            color: var(--text-color);
+            transition: var(--transition);
+            animation: rotateIn 1s ease-out;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes bounceIn {
+            0% { 
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% { 
+                transform: scale(0.9);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes zoomIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from { 
+                opacity: 0;
+                transform: rotate(-180deg) scale(0.1);
+            }
+            to { 
+                opacity: 1;
+                transform: rotate(0) scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(13, 71, 161, 0.4); }
+            to { box-shadow: 0 0 30px rgba(13, 71, 161, 0.8); }
+        }
+
+        @media (max-width: 900px) {
+            .login-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .recent-users {
+                max-width: 440px;
+                order: -1;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container, .recent-users {
+                max-width: 100%;
+            }
+            
+            .login-form {
+                padding: 20px;
+            }
+            
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="peru-flag-background"></div>
+    
+    <button class="theme-toggle" id="themeToggle" title="Cambiar modo claro/oscuro">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2>Exportaciones Peruanas</h2>
+                <p>Sistema de Gestión de Exportaciones</p>
+            </div>
+            
+            <div class="login-form">
+                <div id="errorMsg" class="msg error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="usuario_o_email">Usuario o Correo Electrónico</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-control" id="usuario_o_email" name="usuario_o_email" placeholder="Ingresa tu usuario o correo" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                            <span class="password-toggle" id="passwordToggle">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Iniciar Sesión
+                    </button>
+                </form>
+                
+                <div class="register-link">
+                    ¿No tienes una cuenta? <a href="#" onclick="showRegisterModal()">Solicitar acceso</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-users">
+            <h3>Últimos accesos al sistema</h3>
+            <div class="user-list">
+                <div class="user-item" data-email="admin@exportape.com" data-username="admin">
+                    <div class="avatar-placeholder">
+                        A
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-email">admin@exportape.com</div>
+                    </div>
+                </div>
+                <div class="user-item" data-email="colaborador@exportape.com" data-username="colaborador">
+                    <div class="avatar-placeholder">
+                        C
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Colaborador</div>
+                        <div class="user-email">colaborador@exportape.com</div>
+                    </div>
+                </div>
+                <div class="user-item" data-email="analista@exportape.com" data-username="analista">
+                    <div class="avatar-placeholder">
+                        A
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Analista Comercial</div>
+                        <div class="user-email">analista@exportape.com</div>
+                    </div>
+                </div>
+                <p class="click-hint">Haz clic en un usuario para rellenar automáticamente el campo de usuario/correo</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Solicitar Acceso al Sistema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para solicitar acceso al sistema de Exportaciones Peruanas, por favor contacte al administrador del sistema.</p>
+                    <p><strong>Email:</strong> soporte@exportape.com</p>
+                    <p><strong>Teléfono:</strong> +51 1 234-5678</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Datos de usuarios válidos (simulados)
+        const usuariosValidos = [
+            { usuario: "admin", email: "admin@exportape.com", password: "admin123", rol: "admin", nombre: "Administrador" },
+            { usuario: "colaborador", email: "colaborador@exportape.com", password: "colaborador123", rol: "colaborador", nombre: "Colaborador" }
+        ];
+
+        // Funcionalidad para mostrar/ocultar contraseña
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Funcionalidad para seleccionar usuario
+        document.querySelectorAll('.user-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.user-item').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                
+                const userEmail = this.getAttribute('data-email');
+                document.getElementById('usuario_o_email').value = userEmail;
+                
+                document.getElementById('password').focus();
+            });
+        });
+
+        // Funcionalidad para el modo oscuro
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+        
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+        
+        // Validación del formulario de login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const usuarioInput = document.getElementById('usuario_o_email').value;
+            const passwordInput = document.getElementById('password').value;
+            
+            const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+            
+            // Validar credenciales
+            const usuarioValido = usuariosValidos.find(user => 
+                (user.usuario === usuarioInput || user.email === usuarioInput) && 
+                user.password === passwordInput
+            );
+            
+            if (usuarioValido) {
+                // Guardar información del usuario en localStorage
+                localStorage.setItem('usuarioActual', JSON.stringify(usuarioValido));
+                
+                // Redirigir según el rol
+                if (usuarioValido.rol === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'colaborador.html';
+                }
+            } else {
+                errorText.textContent = '❌ Usuario/correo o contraseña incorrectos.';
+                errorMsg.style.display = 'flex';
+                
+                // Ocultar mensaje después de 5 segundos
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Mostrar modal de registro
+        function showRegisterModal() {
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+        }
+
+        // Animación para elementos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.user-item').forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            document.querySelectorAll('.form-group').forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            const logo = document.querySelector('.logo');
+            if (logo) {
+                setTimeout(() => {
+                    logo.style.animation = 'bounce 2s infinite, glow 3s infinite alternate, float 6s ease-in-out infinite';
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
